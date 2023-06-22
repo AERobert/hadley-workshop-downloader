@@ -1,5 +1,4 @@
 import argparse
-from urllib.parse import urlparse
 
 def create_parser():
     """Create an argument parser for the video downloader script."""
@@ -21,7 +20,7 @@ def create_parser():
         type=str,
         default=None,
         help="Desired name for the downloaded video file. If not specified, the source link's basename will be used.",
-        nargs='+'
+        nargs='*'
     )
     
     # Convert to MP3 flag
@@ -33,3 +32,13 @@ def create_parser():
     
     return parser
 
+def parse_arguments():
+    """Parse command line arguments and perform basic validation."""
+    parser = create_parser()
+    args = parser.parse_args()
+    
+    # Basic validation
+    if args.output and len(args.url) < len(args.output):
+        parser.error("The number of specified output file names exceeds the number of input URLs provided.")
+    
+    return args
