@@ -11,7 +11,8 @@ def create_parser():
         '-u', '--url',
         type=str,
         required=True,
-        help="URL of the webpage containing the video to be downloaded."
+        help="URL(s) of the webpage containing the video to be downloaded.",
+        nargs='+'
     )
     
     # Output file name argument
@@ -19,7 +20,8 @@ def create_parser():
         '-o', '--output',
         type=str,
         default=None,
-        help="Desired name for the downloaded video file. If not specified, the source link's basename will be used."
+        help="Desired name for the downloaded video file. If not specified, the source link's basename will be used.",
+        nargs='+'
     )
     
     # Convert to MP3 flag
@@ -30,3 +32,4 @@ def create_parser():
     )
     
     return parser
+
