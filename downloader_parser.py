@@ -9,8 +9,17 @@ def create_parser():
     parser.add_argument(
         '-u', '--url',
         type=str,
-        required=True,
+        default=[],
         help="URL(s) of the webpage containing the video to be downloaded.",
+        nargs='+'
+    )
+    
+    # Add series option
+    parser.add_argument(
+        '-s', '--series',
+        type=str,
+        default=[],
+        help="URL(s) of the webpages containing a series of videos to be downloaded.",
         nargs='+'
     )
     
@@ -30,6 +39,13 @@ def create_parser():
         help="If set, convert the downloaded MP4 file to MP3 audio."
     )
     
+    # progress bar flag
+    parser.add_argument(
+        '-p', '--progress-bar',
+        action='store_true',
+        help="If set, show a progress bar during video download."
+    )
+    
     return parser
 
 def parse_arguments():
@@ -38,7 +54,11 @@ def parse_arguments():
     args = parser.parse_args()
     
     # Basic validation
-    if args.output and len(args.url) < len(args.output):
+    
+    if not args.url and not args.series:
+        parser.error("You must provide at least one of --url or --series.")
+    
+    if args.url and args.output and len(args.url) < len(args.output):
         parser.error("The number of specified output file names exceeds the number of input URLs provided.")
     
     return args
