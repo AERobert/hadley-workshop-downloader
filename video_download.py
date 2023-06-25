@@ -1,5 +1,6 @@
 import os
 import subprocess
+from functools import cache
 from pathlib import Path
 from urllib.parse import urlparse
 import requests
@@ -8,8 +9,10 @@ from tqdm import tqdm
 from downloader_parser import parse_arguments
 
 
-def extract_video_link(url):
-    """Finds the video source url from the specified webpage"""
+@cache
+def get_html_content(url):
+    """Gets the html content of the webpage specified by URL"""
+
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -17,7 +20,13 @@ def extract_video_link(url):
         print(f"Error fetching the webpage: {e}")
         exit(1)
 
-    html_content = response.text
+    return response.text
+
+
+def extract_video_link(url):
+    """Finds the video source url from the specified webpage"""
+
+    html_content = get_html_content(url)
 
     # Parse HTML and find the video URL
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -62,14 +71,13 @@ def get_workshop_series_urls(url):
         requests.exceptions.RequestException: If an error occurs while making the HTTP request.
         ValueError: If the specified URL is invalid or the required elements are not found.
     """
-    parsed_url = urlparse(url)
-    try:
-        # Make an HTTP GET request to the specified URL
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for any HTTP errors
 
+    html_content = get_html_content(url)
+    parsed_url = urlparse(url)
+
+    try:
         # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(html_content, 'html.parser')
 
         # Find the div with the id "block-workshops"
         workshop_div = soup.find('div', id='block-workshops')
@@ -88,10 +96,6 @@ def get_workshop_series_urls(url):
                 workshop_urls.append(full_url)
 
         return workshop_urls
-
-    except requests.exceptions.RequestException as e:
-        # Handle any network-related errors
-        raise e
 
     except Exception as e:
         # Handle any other exceptions, including BeautifulSoup parsing errors
