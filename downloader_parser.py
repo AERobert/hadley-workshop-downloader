@@ -32,6 +32,14 @@ def create_parser():
         nargs='*'
     )
     
+    # Add --directory argument
+    parser.add_argument(
+        '-d', '--directory',
+        type=str,
+        help="Specify the directory where the output files will be saved.",
+        required=False
+    )
+    
     # Convert to MP3 flag
     parser.add_argument(
         '-a', '--audio',
